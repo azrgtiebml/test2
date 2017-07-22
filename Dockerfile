@@ -1,8 +1,8 @@
-FROM centos:7
+FROM centos:lates
 MAINTAINER Skiychan <dev@skiy.net>
 
-ENV NGINX_VERSION 1.11.6
-ENV PHP_VERSION 7.1.0
+ENV NGINX_VERSION 1.12.1
+ENV PHP_VERSION 7.1.7
 
 RUN set -x && \
     yum install -y gcc \
@@ -15,7 +15,7 @@ RUN set -x && \
 
 #Install PHP library
 ## libmcrypt-devel DIY
-    rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm && \
+    #rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm && \
     yum install -y zlib \
     zlib-devel \
     openssl \
