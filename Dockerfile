@@ -1,4 +1,4 @@
-FROM centos:lates
+FROM centos:latest
 MAINTAINER Skiychan <dev@skiy.net>
 
 ENV NGINX_VERSION 1.12.1
