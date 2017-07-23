@@ -2,6 +2,10 @@ FROM centos:latest
 
 ENV NGINX_VERSION 1.12.1
 ENV PHP_VERSION 7.1.7
+#ENV DOKUWIKI_VERSION 2017-02-19b
+ENV DOKUWIKI_VERSION 4f8e7d4306b067959271cb17b43f2949
+#ENV DOKUWIKI_CSUM ea11e4046319710a2bc6fdf58b5cda86
+ENV DOKUWIKI_CSUM 1062C8C4A23CF4986307984FFECE0F5C
 
 RUN set -x && \
     yum install -y gcc \
@@ -10,7 +14,8 @@ RUN set -x && \
     automake \
     libtool \
     make \
-    cmake
+    cmake \
+    mc
 
 #Install PHP library
 ## libmcrypt-devel DIY
@@ -35,13 +40,17 @@ RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch
 #Add user
 RUN mkdir -p /data/{www,phpext} && \
     useradd -r -s /sbin/nologin -d /data/www -m -k no www  && \
-    echo '- - - = = =  Download nginx & php  = = = - - -'
+    echo "================================================================================" && \
+    echo "                           Download nginx & php                                 " && \
+    echo "================================================================================"
 
 #Download nginx & php
 RUN mkdir -p /home/nginx-php && cd $_ && \
     curl -Lk http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | gunzip | tar x -C /home/nginx-php && \
     curl -Lk http://php.net/distributions/php-$PHP_VERSION.tar.gz | gunzip | tar x -C /home/nginx-php && \
-    echo '- - - = = =  Make install nginx  = = = - - - '
+    echo "================================================================================" && \
+    echo "                             Make install nginx                                 " && \
+    echo "================================================================================"
 
 #Make install nginx
 RUN cd /home/nginx-php/nginx-$NGINX_VERSION && \
@@ -56,7 +65,9 @@ RUN cd /home/nginx-php/nginx-$NGINX_VERSION && \
     --without-mail_imap_module \
     --with-http_gzip_static_module && \
     make && make install && \
-    echo '- - - = = =  Make install php  = = = - - - '
+    echo "================================================================================" && \
+    echo "                             Make install php                                   " && \
+    echo "================================================================================"
 
 #Make install php
 RUN cd /home/nginx-php/php-$PHP_VERSION && \
@@ -103,19 +114,26 @@ RUN cd /home/nginx-php/php-$PHP_VERSION && \
     --disable-debug \
     --without-pear && \
     make && make install && \
-    echo "- - - = = =  Make install php-fpm  = = = - - - "
+    echo "================================================================================" && \
+    echo "                           Make install php-fpm                                 " && \
+    echo "================================================================================"
 
 #Install php-fpm
 RUN cd /home/nginx-php/php-$PHP_VERSION && \
     cp php.ini-production /usr/local/php/etc/php.ini && \
     cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf && \
     cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf && \
-    echo "- - - = = =  Install supervisor  = = = - - - "
+    echo "================================================================================" && \
+    echo "                           Install supervisor                                   " && \
+    echo "================================================================================"
 
 #Install supervisor
 RUN easy_install supervisor && \
     mkdir -p /var/{log/supervisor,run/{sshd,supervisord}} && \
-    echo "- - - = = =  Clean OS  = = = - - - "
+    echo "================================================================================" && \
+    echo "                                 Clean OS                                       " && \
+    echo "================================================================================"
+
 
 #Clean OS
 RUN yum remove -y gcc \
@@ -131,6 +149,11 @@ RUN yum remove -y gcc \
     find /var/log -type f -delete && \
     rm -rf /home/nginx-php && \
 
+RUN cd /data/www && \
+    curl -O -L "https://download.dokuwiki.org/src/dokuwiki/dokuwiki-$DOKUWIKI_VERSION.tgz" && \
+    tar -xzf "dokuwiki-$DOKUWIKI_VERSION.tgz" --strip 1 && \
+    rm "dokuwiki-$DOKUWIKI_VERSION.tgz" && \
+
 #Change Mod from webdir
     chown -R www:www /data/www
 
@@ -140,7 +163,7 @@ ADD supervisord.conf /etc/
 #Create web folder
 VOLUME ["/data/www", "/usr/local/nginx/conf/ssl", "/usr/local/nginx/conf/vhost", "/usr/local/php/etc/php.d", "/data/phpext"]
 
-ADD index.php /data/www/
+#ADD index.php /data/www/
 
 ADD extini/ /usr/local/php/etc/php.d/
 ADD extfile/ /data/phpext/
@@ -149,12 +172,12 @@ ADD extfile/ /data/phpext/
 ADD nginx.conf /usr/local/nginx/conf/
 
 #Start
-RUN echo "- - - = = =  Start /start.sh  = = = - - - "
+RUN echo "- - - = = =  Finishing  = = = - - - "
 ADD start.sh /
 RUN chmod +x /start.sh
 
 #Set port
-EXPOSE 80 443
+EXPOSE 8080 443443
 
 #Start it
 ENTRYPOINT ["/start.sh"]
