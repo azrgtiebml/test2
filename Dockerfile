@@ -147,11 +147,14 @@ RUN yum remove -y gcc \
     rm -rf /tmp/* /var/cache/{yum,ldconfig} /etc/my.cnf{,.d} && \
     mkdir -p --mode=0755 /var/cache/{yum,ldconfig} && \
     find /var/log -type f -delete && \
-    rm -rf /home/nginx-php 
+    rm -rf /home/nginx-php
+
+ADD dokuwiki-4f8e7d4306b067959271cb17b43f2949.tgz /data/www/
 
 RUN cd /data/www && \
-    curl -O -L "https://download.dokuwiki.org/src/dokuwiki/dokuwiki-$DOKUWIKI_VERSION.tgz" && \
-    tar -xzf "dokuwiki-$DOKUWIKI_VERSION.tgz" --strip 1 && \
+    # curl -O -L "https://download.dokuwiki.org/src/dokuwiki/dokuwiki-$DOKUWIKI_VERSION.tgz" && \
+    # tar -xzf "dokuwiki-$DOKUWIKI_VERSION.tgz" --strip 1 && \
+    tar -xzf "dokuwiki-4f8e7d4306b067959271cb17b43f2949.tgz" --strip 1 && \
     rm "dokuwiki-$DOKUWIKI_VERSION.tgz" && \
 
 #Change Mod from webdir
