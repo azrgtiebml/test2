@@ -147,7 +147,7 @@ RUN yum remove -y gcc \
     rm -rf /tmp/* /var/cache/{yum,ldconfig} /etc/my.cnf{,.d} && \
     mkdir -p --mode=0755 /var/cache/{yum,ldconfig} && \
     find /var/log -type f -delete && \
-    rm -rf /home/nginx-php && \
+    rm -rf /home/nginx-php 
 
 RUN cd /data/www && \
     curl -O -L "https://download.dokuwiki.org/src/dokuwiki/dokuwiki-$DOKUWIKI_VERSION.tgz" && \
