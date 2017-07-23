@@ -10,11 +10,12 @@ RUN set -x && \
     automake \
     libtool \
     make \
-    cmake && \
+    cmake
 
 #Install PHP library
 ## libmcrypt-devel DIY
-    rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm && \
+
+RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm && \
     yum install -y zlib \
     zlib-devel \
     openssl \
@@ -29,21 +30,21 @@ RUN set -x && \
     freetype-devel \
     libmcrypt-devel \
     openssh-server \
-    python-setuptools && \
+    python-setuptools
 
 #Add user
-    mkdir -p /data/{www,phpext} && \
-    useradd -r -s /sbin/nologin -d /data/www -m -k no www && \
+RUN mkdir -p /data/{www,phpext} && \
+    useradd -r -s /sbin/nologin -d /data/www -m -k no www  && \
+    echo '- - - = = =  Download nginx & php  = = = - - -'
 
 #Download nginx & php
-    echo "- - - = = =  Download nginx & php  = = = - - - " && \
-    mkdir -p /home/nginx-php && cd $_ && \
+RUN mkdir -p /home/nginx-php && cd $_ && \
     curl -Lk http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | gunzip | tar x -C /home/nginx-php && \
     curl -Lk http://php.net/distributions/php-$PHP_VERSION.tar.gz | gunzip | tar x -C /home/nginx-php && \
+    echo '- - - = = =  Make install nginx  = = = - - - '
 
 #Make install nginx
-    echo "- - - = = =  Make install nginx  = = = - - - " && \
-    cd /home/nginx-php/nginx-$NGINX_VERSION && \
+RUN cd /home/nginx-php/nginx-$NGINX_VERSION && \
     ./configure --prefix=/usr/local/nginx \
     --user=www --group=www \
     --error-log-path=/var/log/nginx_error.log \
@@ -55,10 +56,10 @@ RUN set -x && \
     --without-mail_imap_module \
     --with-http_gzip_static_module && \
     make && make install && \
+    echo '- - - = = =  Make install php  = = = - - - '
 
 #Make install php
-    echo "- - - = = =  Make install php  = = = - - - " && \
-    cd /home/nginx-php/php-$PHP_VERSION && \
+RUN cd /home/nginx-php/php-$PHP_VERSION && \
     ./configure --prefix=/usr/local/php \
     --with-config-file-path=/usr/local/php/etc \
     --with-config-file-scan-dir=/usr/local/php/etc/php.d \
@@ -102,23 +103,22 @@ RUN set -x && \
     --disable-debug \
     --without-pear && \
     make && make install && \
-
+    echo "- - - = = =  Make install php-fpm  = = = - - - "
 
 #Install php-fpm
-    echo "- - - = = =  Make install php-fpm  = = = - - - " && \
-    cd /home/nginx-php/php-$PHP_VERSION && \
+RUN cd /home/nginx-php/php-$PHP_VERSION && \
     cp php.ini-production /usr/local/php/etc/php.ini && \
     cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf && \
     cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf && \
+    echo "- - - = = =  Install supervisor  = = = - - - "
 
 #Install supervisor
-    echo "- - - = = =  Install supervisor  = = = - - - " && \
-    easy_install supervisor && \
+RUN easy_install supervisor && \
     mkdir -p /var/{log/supervisor,run/{sshd,supervisord}} && \
+    echo "- - - = = =  Clean OS  = = = - - - "
 
 #Clean OS
-    echo "- - - = = =  Clean OS  = = = - - - " && \
-    yum remove -y gcc \
+RUN yum remove -y gcc \
     gcc-c++ \
     autoconf \
     automake \
