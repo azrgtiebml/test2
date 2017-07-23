@@ -33,7 +33,7 @@ RUN set -x && \
 
 #Add user
     mkdir -p /data/{www,phpext} && \
-    useradd -r -s /sbin/nologin -d /data/www -m -k www && \
+    useradd -r -s /sbin/nologin -d /data/www -m -k no www && \
 
 #Download nginx & php
     echo "- - - = = =  Download nginx & php  = = = - - - " && \
