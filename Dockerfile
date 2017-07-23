@@ -15,8 +15,7 @@ RUN set -x && \
 
 #Install PHP library
 ## libmcrypt-devel DIY
-    #rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm && \
-    echo "- - - = = =  Install PHP library  = = = - - - " && \
+    rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm && \
     yum install -y zlib \
     zlib-devel \
     openssl \
@@ -34,9 +33,8 @@ RUN set -x && \
     python-setuptools && \
 
 #Add user
-    echo "- - - = = =  Add user  = = = - - - " && \
     mkdir -p /data/{www,phpext} && \
-    useradd -r -s /sbin/nologin -d /data/www -m -k no www && \
+    useradd -r -s /sbin/nologin -d /data/www -m -k www && \
 
 #Download nginx & php
     echo "- - - = = =  Download nginx & php  = = = - - - " && \
